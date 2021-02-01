@@ -1,5 +1,5 @@
 # RLN_elasticity
-Pytorch code used for the paper "Recurrent Localization Networks applied to the Lippmann-Schwinger Equation". All software is contained in the "rln" directory, and a sample driver file is provided in `main.py`. 
+Pytorch code used for the paper _Recurrent Localization Networks applied to the Lippmann-Schwinger Equation_. All software is contained in the `rln` directory, and a sample driver file is provided in `main.py`. 
 
 ## Sample uses
 
@@ -18,4 +18,10 @@ python main.py --eval --load models_trained/RLN_t_c10.model --model_type RLN-t -
 RLN:
 ```
 python main.py --eval --load models_trained/RLN_full_c10.model --model_type RLN --CR 10
+```
+
+### Train models from scratch
+Train FLN using same configuration as paper: 
+```
+python main.py --model_type FLN --CR 10
 ```
