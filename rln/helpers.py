@@ -11,8 +11,8 @@ def dataset_to_np(dataset):
     # makes unzipping easier somehow?
     X, y = zip(*[(detachData(di[0]),
                   detachData(di[1])) for i, di in enumerate(dataset)])
-    X = np.asarray(X).squeeze()
-    y = np.asarray(y).squeeze()
+    X = np.asarray(X)
+    y = np.asarray(y)
     return X, y
 
 # get every entry in a torch dataset
@@ -22,3 +22,8 @@ def detachData(data):
     data = np.asarray(data)
     assert not torch.is_tensor(data)
     return data
+
+def computeImgErr(true, pred):
+    ret = np.abs(true - pred) / np.average(true)
+    return ret
+

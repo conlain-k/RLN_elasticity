@@ -7,6 +7,8 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable, ImageGrid
 
 import numpy as np
 
+from rln.helpers import computeImgErr
+
 matplotlib.rcParams.update({'font.size': 12})
 matplotlib.rcParams.update({'savefig.dpi': 300})
 
@@ -20,10 +22,6 @@ def arr2png(arr, path, size=1080):
     im = im.resize((size, size))
     im.save(path)
     return im
-
-def computeImgErr(true, pred):
-    ret = np.abs(true - pred) / np.average(true)
-    return ret
 
 def addCBaxis(ax):
     divider = make_axes_locatable(ax)
@@ -94,7 +92,7 @@ def show_instance(mh, resp, savefig=False, mz=None, impath="images"):
     return fig
 
 
-def analyze_results(model, test_responses, test_predictions, savefig=False, impath="images", ind_override=None, mi_override=None):
+def analyze_results(test_responses, test_predictions, savefig=False, impath="images", ind_override=None, mi_override=None):
     """ Compute error metrics and make plots """
     # print aggregate results
     print("min, max, avg predicted strain is {:.6f}, {:.6f}, {:.6f}".format(np.amin(test_predictions),
@@ -115,8 +113,8 @@ def analyze_results(model, test_responses, test_predictions, savefig=False, impa
     worst_pred = np.argmax(rel_errs)
     worst_ind, mx, my, mz = np.unravel_index(worst_pred, rel_errs.shape)
 
-    worst_ind = 4936
-    mx, my, mz = (12, 18, 30)
+#    worst_ind = 4936
+ #   mx, my, mz = (12, 18, 30)
 
     # print info for the worst instance
     worst_resp_pred = np.squeeze(test_predictions[worst_ind])
@@ -146,6 +144,7 @@ def analyze_results(model, test_responses, test_predictions, savefig=False, impa
 
     np.save(f"{impath}/mase.npy", MASE)
 
+    # plot error histogram
     if savefig:
         plt.savefig(f"{impath}/err_hist.png", dpi=300)
 
@@ -154,11 +153,7 @@ def analyze_results(model, test_responses, test_predictions, savefig=False, impa
     if savefig:
         plt.savefig(f"{impath}/strain.png", dpi=300)
 
-    stenc = model.plot_stencil()
-    if (stenc is not None) and savefig:
-        plt.savefig(f"{impath}/influence.png", dpi=300)
-        im = arr2png(stenc, f"{impath}/influence1.png", model.ds * 32)
-
+    # now plot errors
     errfig, ax = plt.subplots(1, 1)
     im = ax.imshow(rel_errs[worst_ind, :, :, mz], vmin=0,
                    cmap='coolwarm', origin='lower')
@@ -171,3 +166,18 @@ def analyze_results(model, test_responses, test_predictions, savefig=False, impa
         plt.savefig(f"{impath}/err.png", dpi=300)
 
     return worst_ind, mz, errfig, respfig
+
+
+def main():
+    predictions = np.load("output/lhs_micro_big_21_50_predictions.npy") 
+    true = np.load("data/lhs_micro_big_21_50_test_strain.npy")
+    true = true[:,:,0]
+    true = true.reshape(-1,51,51,51)
+
+    true = true/ np.average(true)
+
+    analyze_results(true, predictions, savefig=True)
+
+
+if __name__ == "__main__":
+    main()

@@ -5,10 +5,10 @@ import os
 import numpy as np
 
 from rln.conv import RLN_localizer
-from rln.helpers import dataset_to_np
+from rln.helpers import dataset_to_np, computeImgErr
 from rln.loaders import loadDataset
-from rln.analyze_data import computeImgErr
 
+import torch
 
 # setup parser
 parser = argparse.ArgumentParser(description="Solve linear elasticity via MKS")
@@ -73,7 +73,7 @@ def main():
     if model_to_load is not None:
         model_to_load = model_to_load[0]
 
-    no_cuda_timers = args.no_cuda
+    no_cuda_timers = args.no_cuda or (not torch.cuda.is_available())
 
     # train or test?
     eval_mode = args.eval
@@ -123,7 +123,6 @@ def main():
     print("Testing model!")
     # start timer if we have CUDA
     if not no_cuda_timers:
-        import torch
         start = torch.cuda.Event(enable_timing=True)
         end = torch.cuda.Event(enable_timing=True)
 
@@ -153,6 +152,8 @@ def main():
     MASE = np.average(100 * rel_errs, axis=(1, 2, 3))
     print(f"Testing MASE error is mean: {np.average(MASE)}, std: {np.std(MASE)}")
 
+    # save predictions to file for analysis later
+    np.save(f"output/{dataset_file_base}_predictions.npy", test_predictions)
 
     return model
 

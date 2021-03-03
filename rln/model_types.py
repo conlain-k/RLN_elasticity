@@ -35,7 +35,9 @@ class RecurrentLocalizationNet(RecNetBase, torch.nn.Module):
             self.unserialize(net_params)
         else:
             self.model_params = None # no hyperparams to load
-
+        
+        print(f"Given ds of {dim_size}, but cached was {self.ds}. Going with new one!")
+        self.ds = dim_size
 
         # should we tie weights across each iteration?
         if reuse_net:
