@@ -153,6 +153,7 @@ def main():
     print(f"Testing MASE error is mean: {np.average(MASE)}, std: {np.std(MASE)}")
 
     # save predictions to file for analysis later
+    os.makedirs("output/", exist_ok=True)
     np.save(f"output/{dataset_file_base}_predictions.npy", test_predictions)
 
     return model

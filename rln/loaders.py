@@ -36,9 +36,6 @@ class LocalizationDataset(Dataset):
         self.mh = self._loadMicro()
         self.resp = self._loadResp()[:,:,:]
 
-        print(self.mh.shape)
-        print(self.resp.shape)
-
         self.mh = self.mh.astype(np.float32)
         self.resp = self.resp.astype(np.float32)
 
